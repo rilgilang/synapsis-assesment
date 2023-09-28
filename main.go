@@ -1,0 +1,66 @@
+package main
+
+import (
+	"fmt"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"log"
+	"synapsis-challenge/bootstrap"
+	"synapsis-challenge/config/yaml"
+	"synapsis-challenge/internal/api/routes"
+	"synapsis-challenge/internal/middlewares/jwt"
+	"synapsis-challenge/internal/repositories"
+	"synapsis-challenge/internal/service"
+	"synapsis-challenge/migrations"
+)
+
+func main() {
+	cfg, err := yaml.NewConfig()
+	if err != nil {
+		log.Fatal(fmt.Sprintf(`read cfg yaml got error : %v`, err))
+	}
+
+	db, err := bootstrap.DatabaseConnection(cfg)
+	if err != nil {
+		log.Fatal(fmt.Sprintf(`db connection error got : %v`, err))
+	}
+
+	fmt.Println("Database connection success!")
+
+	migrations.AutoMigration(db)
+
+	if err != nil {
+		log.Fatal(fmt.Sprintf(`error auto migrate got : %v`, err))
+	}
+
+	fmt.Println("Migration success!")
+
+	//bookRepo := repositories.NewBookRepo(db)
+	userRepo := repositories.NewUserRepo(db)
+
+	middleware := jwt.NewAuthMiddleware(userRepo, cfg)
+
+	//bookService := service.NewBookService(bookRepo)
+	userService := service.NewAuthService(middleware, userRepo)
+
+	app := fiber.New()
+	app.Use(cors.New())
+
+	// Or extend your config for customization
+	app.Use(cors.New(cors.Config{
+		AllowHeaders:     "Origin,Content-Type,Accept,Content-Length,Accept-Language,Accept-Encoding,Connection,Access-Control-Allow-Origin",
+		AllowOrigins:     "*",
+		AllowCredentials: true,
+		AllowMethods:     "GET,POST,PUT,DELETE",
+	}))
+
+	app.Get("/", func(ctx *fiber.Ctx) error {
+		return ctx.Send([]byte("Mwehehe"))
+	})
+
+	api := app.Group("/api")
+	routes.LoginRouter(api, userService)
+	//routes.TodoRouter(api, middleware, todoService)
+
+	log.Fatal(app.Listen(fmt.Sprintf(`:%s`, cfg.App.Port)))
+}

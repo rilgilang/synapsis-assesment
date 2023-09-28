@@ -1,0 +1,11 @@
+app:
+  name: assignment
+  port: 8083
+
+db:
+  dialect: mysql
+  host: localhost
+  port: 3306
+  db_name: assignment # database name
+  username: root # database user
+  password: yea_bois # database password

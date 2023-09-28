@@ -1,0 +1,11 @@
+version: '3'
+services:
+  todo-list-api:
+    image: todo_list_api
+    container_name: todo-list-api
+#    network_mode: todo_list_network
+    restart: always
+    ports:
+      - 8081:8081
+    volumes:
+      - ./config/yaml:/opt/simple-todo-list/config/yaml
