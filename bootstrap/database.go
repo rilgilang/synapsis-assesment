@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"simple-todo-list/config/yaml"
+	"synapsis-challenge/config/yaml"
 )
 
 func DatabaseConnection(config *yaml.Config) (*gorm.DB, error) {
