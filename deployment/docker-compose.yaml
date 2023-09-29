@@ -1,11 +1,12 @@
 version: '3'
+
 services:
-  todo-list-api:
-    image: todo_list_api
-    container_name: todo-list-api
-#    network_mode: todo_list_network
+  synapsis-be-assignment:
+    image: synapsis_be_assignment
+    container_name: synapsis-be-assignment
+    network_mode: todo_list_network
     restart: always
     ports:
-      - 8081:8081
+      - 8082:8082
     volumes:
-      - ./config/yaml:/opt/simple-todo-list/config/yaml
+      - ./config/yaml:/opt/synapsis-be-assignment/config/yaml
