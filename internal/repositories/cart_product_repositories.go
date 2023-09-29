@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"gorm.io/gorm"
+	"synapsis-challenge/internal/consts"
 	"synapsis-challenge/internal/entities"
 	"time"
 )
@@ -9,7 +10,9 @@ import (
 type CartProductRepository interface {
 	ProductInsertToCart(product *entities.CartProduct) error
 	FindProductInCart(userId, cartID string) (*[]entities.CartProduct, error)
+	FindOneProductInCart(userId, productCartId, cartID string) (*entities.CartProduct, error)
 	UpdateProductInCart(cartId, productCartId string, quantity, total int) (*entities.CartProduct, error)
+	DeleteProductFromCart(cartId, productCartId, userId string) error
 }
 type cartProductRepository struct {
 	db *gorm.DB
@@ -33,9 +36,26 @@ func (r *cartProductRepository) FindProductInCart(userId, cartId string) (*[]ent
 
 	return &products, result.Error
 }
+
+func (r *cartProductRepository) FindOneProductInCart(userId, productCartId, cartId string) (*entities.CartProduct, error) {
+	var products entities.CartProduct
+
+	result := r.db.Where("user_id = ?", userId).Where("id = ?", productCartId).Where("cart_id = ?", cartId).Where("deleted_at IS NULL").First(&products)
+	if result.Error != nil && result.Error.Error() == consts.SqlNoRow {
+		return nil, nil
+	}
+
+	return &products, result.Error
+}
+
 func (r *cartProductRepository) UpdateProductInCart(cartId, productCartId string, quantity, total int) (*entities.CartProduct, error) {
 	cartProduct := entities.CartProduct{}
 	result := r.db.Model(&cartProduct).Where("id", productCartId).Where("cart_id", cartId).Update("quantity", quantity).Update("total", total).Update("updated_at", time.Now())
 
 	return &cartProduct, result.Error
+}
+func (r *cartProductRepository) DeleteProductFromCart(cartId, productCartId, userId string) error {
+	err := r.db.Where("id = ?", productCartId).Where("cart_id = ?", cartId).Where("user_id = ?", userId).Delete(&entities.CartProduct{}).Error
+
+	return err
 }

@@ -36,10 +36,11 @@ func AddToCart(service service.CartService) fiber.Handler {
 
 		cart, err := service.AddToCart(helper.InterfaceToString(c.Locals(consts.UserId)), params)
 		if err != nil {
-			return err
+			c.Status(http.StatusInternalServerError)
+			return c.JSON(presenter.CartErrorResponse(err))
 		}
 
-		c.Status(200)
+		c.Status(http.StatusOK)
 		return c.JSON(presenter.CartSuccessResponse(cart))
 	}
 }

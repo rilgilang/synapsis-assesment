@@ -48,6 +48,14 @@ func CartSuccessResponse(src *entities.Cart) *fiber.Map {
 	}
 }
 
+func CartDeleteSuccessResponse() *fiber.Map {
+	return &fiber.Map{
+		"status": true,
+		"data":   "deleted",
+		"error":  nil,
+	}
+}
+
 func CartErrorResponse(err error) *fiber.Map {
 	return &fiber.Map{
 		"status": false,

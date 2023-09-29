@@ -29,17 +29,17 @@ func Login(service service.AuthService) fiber.Handler {
 		user, token, err := service.Login(&userData)
 		//only internal server error
 		if err != nil && err.Error() == consts.InternalServerError {
-			c.Status(500)
+			c.Status(http.StatusInternalServerError)
 			return c.JSON(presenter.AuthErrorResponse(err))
 		}
 
 		//can be unauthorized or something else
 		if err != nil {
-			c.Status(401)
+			c.Status(http.StatusUnauthorized)
 			return c.JSON(presenter.AuthErrorResponse(err))
 		}
 
-		c.Status(200)
+		c.Status(http.StatusOK)
 		return c.JSON(presenter.AuthSuccesResponse(user, *token))
 	}
 }
@@ -62,17 +62,17 @@ func Register(service service.AuthService) fiber.Handler {
 		user, token, err := service.Register(&userData)
 		//only internal server error
 		if err != nil && err.Error() == consts.InternalServerError {
-			c.Status(500)
+			c.Status(http.StatusInternalServerError)
 			return c.JSON(presenter.AuthErrorResponse(err))
 		}
 
 		//can be unauthorized or something else
 		if err != nil {
-			c.Status(401)
+			c.Status(http.StatusUnauthorized)
 			return c.JSON(presenter.AuthErrorResponse(err))
 		}
 
-		c.Status(200)
+		c.Status(http.StatusOK)
 		return c.JSON(presenter.AuthSuccesResponse(user, *token))
 	}
 }

@@ -28,17 +28,11 @@ func GetProducts(service service.ProductService) fiber.Handler {
 		products, err := service.FetchAllProduct(params)
 		//only internal server error
 		if err != nil && err.Error() == consts.InternalServerError {
-			c.Status(500)
+			c.Status(http.StatusInternalServerError)
 			return c.JSON(presenter.ProductErrorResponse(err))
 		}
 
-		//can be unauthorized or something else
-		if err != nil {
-			c.Status(401)
-			return c.JSON(presenter.ProductErrorResponse(err))
-		}
-
-		c.Status(200)
+		c.Status(http.StatusOK)
 		return c.JSON(presenter.ProductsSuccessResponse(products))
 	}
 }
