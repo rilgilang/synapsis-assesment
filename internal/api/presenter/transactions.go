@@ -1,7 +1,6 @@
 package presenter
 
 import (
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"synapsis-challenge/internal/entities"
 )
@@ -20,11 +19,39 @@ type TransactionProduct struct {
 	Total       int    `json:"total"`
 }
 
+func TransactionPaymentSuccessResponse(src *entities.Transaction) *fiber.Map {
+	//TODO find better way to present transactions
+	data := Transactions{
+		ID:       src.ID,
+		SubTotal: src.Total,
+		Status:   src.Status,
+		Products: nil,
+	}
+
+	var products []TransactionProduct
+	for _, product := range src.Order {
+		pr := TransactionProduct{
+			ID:          product.ProductId,
+			ProductName: product.ProductName,
+			Quantity:    product.Quantity,
+			Total:       product.Total,
+		}
+		products = append(products, pr)
+	}
+
+	data.Products = products
+
+	return &fiber.Map{
+		"status": true,
+		"data":   data,
+		"error":  nil,
+	}
+}
+
 func TransactionsSuccessResponse(src *[]entities.Transaction) *fiber.Map {
 	data := []Transactions{}
 	//TODO find better way to present transactions
 	for _, transaction := range *src {
-		fmt.Println("transaction id --> ", transaction.ID)
 		tr := Transactions{
 			ID:       transaction.ID,
 			SubTotal: transaction.Total,

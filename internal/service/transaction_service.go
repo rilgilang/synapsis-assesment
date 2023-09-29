@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/pkg/errors"
+	"synapsis-challenge/internal/api/request_model"
 	"synapsis-challenge/internal/consts"
 	"synapsis-challenge/internal/entities"
 	"synapsis-challenge/internal/repositories"
@@ -9,6 +10,7 @@ import (
 
 type TransactionsService interface {
 	FetchAllTransactions(currentUserId string) (*[]entities.Transaction, error)
+	PaymentTransaction(currentUserId string, param request_model.PaymentTransaction) (*entities.Transaction, error)
 }
 
 type transactionsService struct {
@@ -28,4 +30,28 @@ func (p transactionsService) FetchAllTransactions(currentUserId string) (*[]enti
 	}
 
 	return productsData, nil
+}
+
+func (p transactionsService) PaymentTransaction(currentUserId string, param request_model.PaymentTransaction) (*entities.Transaction, error) {
+
+	transactionData, err := p.transactionsRepository.FetchOneTransactions(currentUserId, param.TransactionId)
+	if err != nil {
+		return nil, errors.New(consts.InternalServerError)
+	}
+
+	//check if amount less than the total of transactions
+	if param.Amount < transactionData.Total {
+		return nil, errors.New(consts.InsufficientAmount)
+	}
+
+	transactionData.Status = consts.Completed
+
+	//update transactions status
+	transactionData, err = p.transactionsRepository.UpdateTransaction(transactionData)
+
+	if err != nil {
+		return nil, errors.New(consts.InternalServerError)
+	}
+
+	return transactionData, nil
 }

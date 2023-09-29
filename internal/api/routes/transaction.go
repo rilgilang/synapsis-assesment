@@ -9,4 +9,5 @@ import (
 
 func TransactionsRouter(app fiber.Router, middleware jwt.AuthMiddleware, transactionService service.TransactionsService) {
 	app.Get("/transactions", middleware.ValidateToken(), handlers.GetTransactions(transactionService))
+	app.Post("/transactions/pay", middleware.ValidateToken(), handlers.Payment(transactionService))
 }
