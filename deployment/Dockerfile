@@ -8,10 +8,10 @@ RUN apk update && apk --no-cache add  build-base  git bash  coreutils openssh  o
 
 # this command if you get source from bitbucket repos
 # Create the directory where the application will reside
-RUN mkdir -p /go/src/synapsis-be-assignment
+RUN mkdir -p /go/src/synapsis-challenge
 
 
-WORKDIR /go/src/synapsis-be-assignment
+WORKDIR /go/src/synapsis-challenge
 
 COPY . .
 
@@ -29,8 +29,8 @@ FROM alpine:3.17.0
 # setup package dependencies
 RUN apk --no-cache update
 
-ENV BUILDDIR=/go/src/synapsis-be-assignment
-ENV PROJECT_DIR=/opt/synapsis-be-assignment
+ENV BUILDDIR=/go/src/synapsis-challenge
+ENV PROJECT_DIR=/opt/synapsis-challenge
 
 # Setting timezone
 ENV TZ=Asia/Jakarta
@@ -46,7 +46,7 @@ RUN mkdir -p $PROJECT_DIR/config
 
 WORKDIR $PROJECT_DIR
 
-COPY --from=builder $BUILDDIR/synapsis-be-assignment synapsis-be-assignment
+COPY --from=builder $BUILDDIR/synapsis-challenge synapsis-challenge
 
 
-CMD ["sh","-c", "/opt/synapsis-be-assignment/synapsis-be-assignment"]
+CMD ["sh","-c", "/opt/synapsis-challenge/synapsis-challenge"]
