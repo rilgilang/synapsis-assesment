@@ -15,11 +15,15 @@ import (
 )
 
 func main() {
+
+	//environment vairable that im using is app.yaml
+	//no specific reason only I usually use yaml like this because it looks cleaner and readable
 	cfg, err := yaml.NewConfig()
 	if err != nil {
 		log.Fatal(fmt.Sprintf(`read cfg yaml got error : %v`, err))
 	}
 
+	//made connection to our database
 	db, err := bootstrap.DatabaseConnection(cfg)
 	if err != nil {
 		log.Fatal(fmt.Sprintf(`db connection error got : %v`, err))
@@ -35,7 +39,7 @@ func main() {
 
 	fmt.Println("Migration success!")
 
-	//bookRepo := repositories.NewBookRepo(db)
+	//repository to interact with database
 	userRepo := repositories.NewUserRepo(db)
 	productRepo := repositories.NewProductRepo(db)
 	cartRepo := repositories.NewCartRepo(db)
@@ -43,9 +47,10 @@ func main() {
 	orderRepo := repositories.NewOrdersRepo(db)
 	transactionRepo := repositories.NewTransactionsRepo(db)
 
+	//middleware for validation authorization
 	middleware := jwt.NewAuthMiddleware(userRepo, cfg)
 
-	//bookService := service.NewBookService(bookRepo)
+	//setup the service / bussines logic that we gonna used later
 	userService := service.NewAuthService(middleware, userRepo)
 	productService := service.NewProductService(productRepo)
 	cartService := service.NewCartService(productRepo, cartRepo, cartProductRepo)
@@ -67,6 +72,7 @@ func main() {
 		return ctx.Send([]byte("Mwehehe"))
 	})
 
+	//setup the routers
 	api := app.Group("/api")
 	routes.LoginRouter(api, userService)
 	routes.ProductRouter(api, productService)

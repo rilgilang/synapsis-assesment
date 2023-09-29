@@ -23,6 +23,7 @@ func NewProductService(productRepository repositories.ProductRepository) Product
 }
 
 func (p productService) FetchAllProduct(param request_model.GetProducts) (*[]entities.Product, error) {
+	//just simple fetch data from db nothing special
 	productsData, err := p.productRepository.FindAllProducts(param)
 	if err != nil {
 		return nil, errors.New(consts.InternalServerError)

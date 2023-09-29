@@ -5,6 +5,20 @@ import (
 	"reflect"
 )
 
+//honestly i preffered raw query rather than using gorm
+//this function is used for query builder but its still 50% complete
+//where string of raw query is concated with this function result
+//example of code
+// ================================================================================
+// query := `Select * from users %s` the %s is used for concatting the where
+// where, value := WhereBuilder("db", entity.User{})
+// query := fmt.sprintf(`Select * from users %s`, where)
+// ================================================================================
+
+// so the result query looks like this
+// Select * from users Where id = ?
+// how about the value? we'll use variadic function from library mysql
+
 func WhereBuilder(tags string, p interface{}) (field []string, value []string) {
 
 	v := reflect.ValueOf(p).Elem()

@@ -37,6 +37,8 @@ type JWT struct {
 	ExpiredMinute int    `yaml:"expired_minute" json:"expired_minute"`
 }
 
+// you see Config struct in line 8? well each value of that struct will filled with this function
+// this function is used for read the yaml file then stored to the Config struct
 func NewConfig() (*Config, error) {
 	var config *Config
 

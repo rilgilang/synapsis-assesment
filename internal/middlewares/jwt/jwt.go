@@ -13,6 +13,9 @@ import (
 	"time"
 )
 
+//well 80% from this code is copied from google i just modified a little bit like the instance and the method
+//for easy understanding
+
 type AuthMiddleware interface {
 	GenerateToken(user *entities.User) (*string, error)
 	ValidateToken() fiber.Handler

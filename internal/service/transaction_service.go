@@ -24,6 +24,7 @@ func NewTransactionsService(transactionsRepository repositories.TransactionsRepo
 }
 
 func (p transactionsService) FetchAllTransactions(currentUserId string) (*[]entities.Transaction, error) {
+	//fetching all transactions data from db
 	productsData, err := p.transactionsRepository.FetchTransactions(currentUserId)
 	if err != nil {
 		return nil, errors.New(consts.InternalServerError)
@@ -33,6 +34,10 @@ func (p transactionsService) FetchAllTransactions(currentUserId string) (*[]enti
 }
 
 func (p transactionsService) PaymentTransaction(currentUserId string, param request_model.PaymentTransaction) (*entities.Transaction, error) {
+
+	//because the deadline is near I only made the simplest payment logic
+	//
+	//this logic only check amount from request data if amount less than the sub total then throw response error
 
 	transactionData, err := p.transactionsRepository.FetchOneTransactions(currentUserId, param.TransactionId)
 	if err != nil {

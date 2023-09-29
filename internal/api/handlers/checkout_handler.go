@@ -12,6 +12,7 @@ import (
 func Checkout(service service.CheckoutService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
+		//calling the service or the bussines logic
 		transactions, err := service.CheckoutCart(helper.InterfaceToString(c.Locals(consts.UserId)))
 		//only internal server error
 		if err != nil {

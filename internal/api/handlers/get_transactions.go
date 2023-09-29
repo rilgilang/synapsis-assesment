@@ -12,6 +12,7 @@ import (
 func GetTransactions(service service.TransactionsService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
+		//business logic
 		transactions, err := service.FetchAllTransactions(helper.InterfaceToString(c.Locals(consts.UserId)))
 		//only internal server error
 		if err != nil {

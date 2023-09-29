@@ -15,16 +15,20 @@ import (
 
 func Payment(service service.TransactionsService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		//create new struct for our req body
 		var params request_model.PaymentTransaction
 
+		//parsing to our struct that we already made before
 		err := c.BodyParser(&params)
 		if err != nil {
 			c.Status(http.StatusBadRequest)
 			return c.JSON(presenter.TransactionsErrorResponse(errors.New(consts.BadRequest)))
 		}
 
+		//validating uuid
 		compile, _ := regexp.Compile("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$")
 
+		//validation
 		err = validation.ValidateStruct(&params,
 			validation.Field(&params.TransactionId, validation.Required, validation.Length(36, 36), validation.Match(compile)),
 			validation.Field(&params.Amount, validation.Required, validation.Min(0)),
@@ -35,8 +39,10 @@ func Payment(service service.TransactionsService) fiber.Handler {
 			return c.JSON(presenter.TransactionsErrorResponse(err))
 		}
 
+		//payment business logic
 		transaction, err := service.PaymentTransaction(helper.InterfaceToString(c.Locals(consts.UserId)), params)
 		if err != nil {
+			//validation from busines logic
 			if err.Error() == consts.InsufficientAmount {
 				c.Status(http.StatusUnprocessableEntity)
 				return c.JSON(presenter.TransactionsErrorResponse(err))

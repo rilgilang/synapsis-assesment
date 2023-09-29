@@ -18,7 +18,7 @@ func NewOrdersRepo(db *gorm.DB) OrderRepository {
 	}
 }
 
-func (r orderRepository) InsertOrder(order *entities.Order) error {
+func (r *orderRepository) InsertOrder(order *entities.Order) error {
 	result := r.db.Create(&order)
 
 	return result.Error

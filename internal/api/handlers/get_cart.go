@@ -12,6 +12,7 @@ import (
 func GetCart(service service.CartService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
+		//bussines logic
 		cart, err := service.FetchCart(helper.InterfaceToString(c.Locals(consts.UserId)))
 		//only internal server error
 		if err != nil && err.Error() == consts.InternalServerError {
@@ -22,4 +23,5 @@ func GetCart(service service.CartService) fiber.Handler {
 		c.Status(http.StatusOK)
 		return c.JSON(presenter.CartSuccessResponse(cart))
 	}
+
 }

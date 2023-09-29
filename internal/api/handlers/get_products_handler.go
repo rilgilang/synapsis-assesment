@@ -12,10 +12,13 @@ import (
 
 func GetProducts(service service.ProductService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		//create new struct for our req body
 		var params request_model.GetProducts
 
+		//parsing to our struct that we already made before
 		params.Category = c.Query("category")
 
+		//validation
 		err := validation.ValidateStruct(&params,
 			validation.Field(&params.Category, validation.Length(0, 20)),
 		)
@@ -25,6 +28,7 @@ func GetProducts(service service.ProductService) fiber.Handler {
 			return c.JSON(presenter.ProductErrorResponse(err))
 		}
 
+		//business logic
 		products, err := service.FetchAllProduct(params)
 		//only internal server error
 		if err != nil && err.Error() == consts.InternalServerError {

@@ -81,7 +81,8 @@ func (p checkoutService) CheckoutCart(currentUserId string) (*[]entities.Transac
 	}
 
 	cart.Total = 0
-	//update cart
+	//cleaning cart
+	//update cart total
 	_, err = p.cartRepository.UpdateCart(cart)
 	if err != nil {
 		return nil, err

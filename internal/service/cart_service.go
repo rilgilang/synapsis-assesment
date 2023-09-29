@@ -34,7 +34,7 @@ func NewCartService(
 	}
 }
 
-func (p cartService) AddToCart(currentUserId string, param request_model.AddToCart) (*entities.Cart, error) {
+func (p *cartService) AddToCart(currentUserId string, param request_model.AddToCart) (*entities.Cart, error) {
 	//get the product detail
 	productsData, err := p.productRepository.FindOneProducts(param.ProductId)
 	if err != nil {
@@ -76,19 +76,33 @@ func (p cartService) AddToCart(currentUserId string, param request_model.AddToCa
 		return nil, errors.New(consts.InternalServerError)
 	}
 
+	//this is used for checking if product already in cart or not
 	checkProduct := map[string]string{}
+
+	//initialize product not already in cart
 	checkProduct["alreadyInCart"] = "false"
+
+	//set the quantity from the param
 	newCartProductQuantity := param.Total
+
+	//set default total price
 	newCartProductTotal := 0
 	subTotal := 0
 
+	//iterate through product that already in cart
 	for _, productCart := range *productsInCart {
+
+		//if product already in cart
 		if productCart.ProductId == param.ProductId {
+
+			//set true we use this for validation later
 			checkProduct["alreadyInCart"] = "true"
 			checkProduct["productCartId"] = productCart.ID
 
+			//set the product total price
 			newCartProductTotal = newCartProductQuantity * productsData.Price
 
+			//basic formula for sub total
 			subTotal += newCartProductTotal
 		} else {
 			subTotal += newCartProductTotal
@@ -96,6 +110,7 @@ func (p cartService) AddToCart(currentUserId string, param request_model.AddToCa
 		}
 	}
 
+	//if product already in cart then we dont need to insert just update the product based on the request body
 	if checkProduct["alreadyInCart"] == "true" {
 		_, err = p.productCartRepository.UpdateProductInCart(cart.ID, checkProduct["productCartId"], newCartProductQuantity, newCartProductTotal)
 
@@ -104,6 +119,9 @@ func (p cartService) AddToCart(currentUserId string, param request_model.AddToCa
 		}
 
 	} else {
+
+		//if product not in cart then insert
+
 		//inserting product to cart
 		err = p.productCartRepository.ProductInsertToCart(&entities.CartProduct{
 			ID:          uuid.New().String(),
@@ -134,6 +152,7 @@ func (p cartService) AddToCart(currentUserId string, param request_model.AddToCa
 		return nil, errors.New(consts.InternalServerError)
 	}
 
+	//fetch latest cart data for the response
 	cart, err = p.cartRepository.FetchCart(currentUserId)
 	if err != nil {
 		return nil, errors.New(consts.InternalServerError)
@@ -142,7 +161,7 @@ func (p cartService) AddToCart(currentUserId string, param request_model.AddToCa
 	return cart, nil
 }
 
-func (p cartService) FetchCart(currentUserId string) (*entities.Cart, error) {
+func (p *cartService) FetchCart(currentUserId string) (*entities.Cart, error) {
 	//find user cart
 	cart, err := p.cartRepository.CheckCart(currentUserId)
 
@@ -171,7 +190,7 @@ func (p cartService) FetchCart(currentUserId string) (*entities.Cart, error) {
 	return cart, nil
 }
 
-func (p cartService) DeleteFromCart(currentUserId string, param request_model.DeleteFromCart) error {
+func (p *cartService) DeleteFromCart(currentUserId string, param request_model.DeleteFromCart) error {
 	//find user cart
 	cart, err := p.cartRepository.CheckCart(currentUserId)
 

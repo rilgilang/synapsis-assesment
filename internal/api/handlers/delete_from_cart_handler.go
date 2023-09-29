@@ -14,12 +14,16 @@ import (
 
 func DeleteProductFromCart(service service.CartService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		//create new struct for our req param
 		var params request_model.DeleteFromCart
 
+		//parsing to our struct that we already made before
 		params.Id = c.Params("id")
 
+		//regex compiler for checking uuidv4
 		compile, _ := regexp.Compile("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$")
 
+		//validation
 		err := validation.ValidateStruct(&params,
 			validation.Field(&params.Id, validation.Required, validation.Length(36, 36), validation.Match(compile)),
 		)
@@ -29,6 +33,7 @@ func DeleteProductFromCart(service service.CartService) fiber.Handler {
 			return c.JSON(presenter.CartErrorResponse(err))
 		}
 
+		//business logic
 		err = service.DeleteFromCart(helper.InterfaceToString(c.Locals(consts.UserId)), params)
 		if err != nil {
 			if err.Error() == consts.InternalServerError {
