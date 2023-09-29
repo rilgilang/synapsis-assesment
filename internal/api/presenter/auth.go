@@ -7,7 +7,7 @@ import (
 
 // User is the presenter object which will be passed in the response by Handler
 type User struct {
-	ID       int    `json:"id" bson:"_id,omitempty"`
+	ID       string `json:"id" bson:"_id,omitempty"`
 	Username string `json:"username"`
 	Token    string `json:"token"`
 }

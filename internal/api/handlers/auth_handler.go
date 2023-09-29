@@ -5,6 +5,7 @@ import (
 	"github.com/pkg/errors"
 	"net/http"
 	"synapsis-challenge/internal/api/presenter"
+	"synapsis-challenge/internal/api/request_model"
 	"synapsis-challenge/internal/consts"
 	entities2 "synapsis-challenge/internal/entities"
 	"synapsis-challenge/internal/service"
@@ -12,7 +13,7 @@ import (
 
 func Login(service service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var requestBody entities2.User
+		var requestBody request_model.Login
 		err := c.BodyParser(&requestBody)
 		if err != nil {
 			c.Status(http.StatusBadRequest)
@@ -23,7 +24,9 @@ func Login(service service.AuthService) fiber.Handler {
 			return c.JSON(presenter.AuthErrorResponse(errors.New(
 				"Please specify username and password")))
 		}
-		user, token, err := service.Login(&requestBody)
+
+		userData := entities2.User{Username: requestBody.Username, Password: requestBody.Password}
+		user, token, err := service.Login(&userData)
 		//only internal server error
 		if err != nil && err.Error() == consts.InternalServerError {
 			c.Status(500)
@@ -43,7 +46,7 @@ func Login(service service.AuthService) fiber.Handler {
 
 func Register(service service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var requestBody entities2.User
+		var requestBody request_model.Register
 		err := c.BodyParser(&requestBody)
 		if err != nil {
 			c.Status(http.StatusBadRequest)
@@ -55,7 +58,8 @@ func Register(service service.AuthService) fiber.Handler {
 				"Please specify username and password")))
 		}
 
-		user, token, err := service.Register(&requestBody)
+		userData := entities2.User{Username: requestBody.Username, Password: requestBody.Password}
+		user, token, err := service.Register(&userData)
 		//only internal server error
 		if err != nil && err.Error() == consts.InternalServerError {
 			c.Status(500)

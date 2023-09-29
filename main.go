@@ -37,11 +37,16 @@ func main() {
 
 	//bookRepo := repositories.NewBookRepo(db)
 	userRepo := repositories.NewUserRepo(db)
+	productRepo := repositories.NewProductRepo(db)
+	cartRepo := repositories.NewCartRepo(db)
+	cartProductRepo := repositories.NewCartProductRepo(db)
 
 	middleware := jwt.NewAuthMiddleware(userRepo, cfg)
 
 	//bookService := service.NewBookService(bookRepo)
 	userService := service.NewAuthService(middleware, userRepo)
+	productService := service.NewProductService(productRepo)
+	cartService := service.NewCartService(productRepo, cartRepo, cartProductRepo)
 
 	app := fiber.New()
 	app.Use(cors.New())
@@ -60,6 +65,8 @@ func main() {
 
 	api := app.Group("/api")
 	routes.LoginRouter(api, userService)
+	routes.ProductRouter(api, productService)
+	routes.CartRouter(api, middleware, cartService)
 	//routes.TodoRouter(api, middleware, todoService)
 
 	log.Fatal(app.Listen(fmt.Sprintf(`:%s`, cfg.App.Port)))

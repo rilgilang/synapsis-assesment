@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"synapsis-challenge/internal/consts"
 	"synapsis-challenge/internal/entities"
@@ -9,7 +10,7 @@ import (
 	"synapsis-challenge/internal/repositories"
 )
 
-// Service is an interface from which our api module can access our repository of all our models
+// Service is an interface from which api module can access our repository of all our models
 type AuthService interface {
 	Login(user *entities.User) (userData *entities.User, token *string, err error)
 	Register(user *entities.User) (userData *entities.User, token *string, err error)
@@ -71,6 +72,8 @@ func (s *authService) Register(user *entities.User) (*entities.User, *string, er
 
 	//set to salted password
 	user.Password = string(saltByte)
+
+	user.ID = uuid.New().String()
 
 	err = s.userRepo.CreateUser(user)
 
