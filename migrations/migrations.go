@@ -8,9 +8,9 @@ import (
 var models = []interface{}{
 	&entities.User{},
 	&entities.Product{},
+	&entities.Cart{},
 	&entities.CartProduct{},
 	&entities.Transaction{},
-	&entities.Cart{},
 	&entities.ProductCategory{},
 	&entities.Order{},
 }
