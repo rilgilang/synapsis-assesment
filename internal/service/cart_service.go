@@ -12,6 +12,7 @@ import (
 
 type CartService interface {
 	AddToCart(currentUserId string, param request_model.AddToCart) (*entities.Cart, error)
+	FetchCart(currentUserId string) (*entities.Cart, error)
 }
 
 type cartService struct {
@@ -89,6 +90,7 @@ func (p cartService) AddToCart(currentUserId string, param request_model.AddToCa
 
 			subTotal += newCartProductTotal
 		} else {
+			subTotal += newCartProductTotal
 			subTotal += productCart.Total
 		}
 	}
@@ -118,6 +120,7 @@ func (p cartService) AddToCart(currentUserId string, param request_model.AddToCa
 			return nil, errors.New(consts.InternalServerError)
 		}
 
+		subTotal += param.Total * productsData.Price
 	}
 
 	//updating cart total price
@@ -127,6 +130,35 @@ func (p cartService) AddToCart(currentUserId string, param request_model.AddToCa
 
 	if err != nil {
 		return nil, errors.New(consts.InternalServerError)
+	}
+
+	cart, err = p.cartRepository.FetchCart(currentUserId)
+	if err != nil {
+		return nil, errors.New(consts.InternalServerError)
+	}
+
+	return cart, nil
+}
+
+func (p cartService) FetchCart(currentUserId string) (*entities.Cart, error) {
+	//find user cart
+	cart, err := p.cartRepository.CheckCart(currentUserId)
+
+	if err != nil {
+		return nil, errors.New(consts.InternalServerError)
+	}
+
+	//if user has no cart yet then create a new cart
+	if cart == nil {
+		err = p.cartRepository.CreateCart(&entities.Cart{
+			ID:        uuid.New().String(),
+			UserId:    currentUserId,
+			Total:     0,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			DeletedAt: nil,
+		})
+
 	}
 
 	cart, err = p.cartRepository.FetchCart(currentUserId)
