@@ -1,8 +1,6 @@
 package repositories
 
 import (
-	"encoding/json"
-	"fmt"
 	"gorm.io/gorm"
 	"synapsis-challenge/internal/entities"
 )
@@ -28,8 +26,6 @@ func (r transactionRepository) FetchTransactions(currentUserId string) (*[]entit
 
 	result := r.db.Preload("Order").Where("transactions.user_id = ?", currentUserId).Order("created_at desc").Find(&transactions)
 
-	b, _ := json.Marshal(&transactions)
-	fmt.Println("repo transactions --> ", string(b))
 	return &transactions, result.Error
 }
 
