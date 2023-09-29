@@ -106,15 +106,16 @@ func (p cartService) AddToCart(currentUserId string, param request_model.AddToCa
 	} else {
 		//inserting product to cart
 		err = p.productCartRepository.ProductInsertToCart(&entities.CartProduct{
-			ID:        uuid.New().String(),
-			UserId:    currentUserId,
-			CartId:    cart.ID,
-			ProductId: param.ProductId,
-			Quantity:  param.Total,
-			Total:     param.Total * productsData.Price,
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-			DeletedAt: nil,
+			ID:          uuid.New().String(),
+			UserId:      currentUserId,
+			CartId:      cart.ID,
+			ProductId:   param.ProductId,
+			ProductName: productsData.ProductName,
+			Quantity:    param.Total,
+			Total:       param.Total * productsData.Price,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+			DeletedAt:   nil,
 		})
 
 		if err != nil {

@@ -13,24 +13,26 @@ type Cart struct {
 }
 
 type ProductData struct {
-	ID        string `json:"product_cart_id"`
-	CartID    string `json:"cart_id"`
-	ProductId string `json:"product_id"`
-	Quantity  int    `json:"quantity"`
-	Total     int    `json:"total"`
+	ID          string `json:"product_cart_id"`
+	CartID      string `json:"cart_id"`
+	ProductId   string `json:"product_id"`
+	ProductName string `json:"product_name"`
+	Quantity    int    `json:"quantity"`
+	Total       int    `json:"total"`
 }
 
 func CartSuccessResponse(src *entities.Cart) *fiber.Map {
-	productList := []ProductData{}
+	var productList []ProductData
 
 	for _, v := range src.CartProduct {
 
 		productList = append(productList, ProductData{
-			ID:        v.ID,
-			CartID:    v.CartId,
-			ProductId: v.ProductId,
-			Quantity:  v.Quantity,
-			Total:     v.Total,
+			ID:          v.ID,
+			CartID:      v.CartId,
+			ProductId:   v.ProductId,
+			ProductName: v.ProductName,
+			Quantity:    v.Quantity,
+			Total:       v.Total,
 		})
 	}
 

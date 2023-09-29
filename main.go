@@ -40,6 +40,8 @@ func main() {
 	productRepo := repositories.NewProductRepo(db)
 	cartRepo := repositories.NewCartRepo(db)
 	cartProductRepo := repositories.NewCartProductRepo(db)
+	orderRepo := repositories.NewOrdersRepo(db)
+	transactionRepo := repositories.NewTransactionsRepo(db)
 
 	middleware := jwt.NewAuthMiddleware(userRepo, cfg)
 
@@ -47,6 +49,8 @@ func main() {
 	userService := service.NewAuthService(middleware, userRepo)
 	productService := service.NewProductService(productRepo)
 	cartService := service.NewCartService(productRepo, cartRepo, cartProductRepo)
+	checkoutService := service.NewCheckoutService(transactionRepo, cartRepo, orderRepo, cartProductRepo)
+	transactionsService := service.NewTransactionsService(transactionRepo)
 
 	app := fiber.New()
 	app.Use(cors.New())
@@ -67,7 +71,8 @@ func main() {
 	routes.LoginRouter(api, userService)
 	routes.ProductRouter(api, productService)
 	routes.CartRouter(api, middleware, cartService)
-	//routes.TodoRouter(api, middleware, todoService)
+	routes.CheckoutRouter(api, middleware, checkoutService)
+	routes.TransactionsRouter(api, middleware, transactionsService)
 
 	log.Fatal(app.Listen(fmt.Sprintf(`:%s`, cfg.App.Port)))
 }

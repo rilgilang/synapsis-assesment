@@ -13,6 +13,7 @@ type CartProductRepository interface {
 	FindOneProductInCart(userId, productCartId, cartID string) (*entities.CartProduct, error)
 	UpdateProductInCart(cartId, productCartId string, quantity, total int) (*entities.CartProduct, error)
 	DeleteProductFromCart(cartId, productCartId, userId string) error
+	DeleteAllProductFromCart(cartId, userId string) error
 }
 type cartProductRepository struct {
 	db *gorm.DB
@@ -54,8 +55,15 @@ func (r *cartProductRepository) UpdateProductInCart(cartId, productCartId string
 
 	return &cartProduct, result.Error
 }
+
 func (r *cartProductRepository) DeleteProductFromCart(cartId, productCartId, userId string) error {
 	err := r.db.Where("id = ?", productCartId).Where("cart_id = ?", cartId).Where("user_id = ?", userId).Delete(&entities.CartProduct{}).Error
+
+	return err
+}
+
+func (r *cartProductRepository) DeleteAllProductFromCart(cartId, userId string) error {
+	err := r.db.Where("cart_id = ?", cartId).Where("user_id = ?", userId).Delete(&entities.CartProduct{}).Error
 
 	return err
 }

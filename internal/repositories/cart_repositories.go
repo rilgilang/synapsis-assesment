@@ -41,7 +41,7 @@ func (r *cartRepository) CheckCart(userId string) (*entities.Cart, error) {
 
 func (r *cartRepository) UpdateCart(cart *entities.Cart) (*entities.Cart, error) {
 	cart.UpdatedAt = time.Now()
-	result := r.db.Model(&cart).Update("total", cart.Total).Update("updated_at", cart.UpdatedAt).Where("user_id", cart.UserId)
+	result := r.db.Model(&cart).Where("user_id", cart.UserId).Update("total", &cart.Total).Update("updated_at", cart.UpdatedAt)
 	return cart, result.Error
 }
 
