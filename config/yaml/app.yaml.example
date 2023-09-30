@@ -9,3 +9,7 @@ db:
   db_name: assignment # database name
   username: root # database user
   password: yea_bois # database password
+
+jwt:
+  key: my_secret_key
+  expired_minute: 25
